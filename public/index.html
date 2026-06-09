@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Curtin Canvas — Course Timeline 2025–2027</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',system-ui,sans-serif;background:#f7f6f3;color:#2c2c2a;line-height:1.6}
+.page{max-width:1260px;margin:0 auto;padding:32px 24px}
+header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;flex-wrap:wrap;gap:12px}
+h1{font-size:24px;font-weight:600;color:#1a1a1a;letter-spacing:-.5px}
+.subtitle{font-size:13px;color:#6b6b67;margin-top:4px}
+.generated{font-size:11px;color:#9b9b96;text-align:right}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:#fff;border-radius:10px;padding:14px 16px;border:1px solid #e8e6e1}
+.stat-label{font-size:10px;text-transform:uppercase;letter-spacing:.6px;color:#8a8a85;margin-bottom:2px}
+.stat-value{font-size:26px;font-weight:600;color:#1a1a1a}
+.grn{color:#0f6e56}.amb{color:#854f0b}.pur{color:#6C3FA0}
+.filter-bar{background:#fff;border-radius:10px;border:1px solid #e8e6e1;padding:14px 18px;margin-bottom:18px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.filter-bar label{font-size:11px;font-weight:500;color:#6b6b67}
+.filter-bar select,.filter-bar input[type=date],.filter-bar button{font-family:inherit;font-size:11px;padding:5px 10px;border-radius:7px;border:1px solid #d3d1c7;background:#fff;color:#444;cursor:pointer;transition:all .15s}
+.filter-bar button:hover{background:#f0efeb}
+.filter-bar button.on{background:#0f6e56;color:#fff;border-color:#0f6e56}
+.filter-group{display:flex;align-items:center;gap:5px}
+.filter-sep{width:1px;height:24px;background:#e8e6e1;margin:0 4px}
+.preset-btns button{font-size:10px;padding:3px 8px;border-radius:5px;border:1px solid #d3d1c7;background:#fff;color:#6b6b67;cursor:pointer}
+.preset-btns button:hover{background:#f0efeb}
+.preset-btns button.active{background:#6C3FA0;color:#fff;border-color:#6C3FA0}
+.legend{display:flex;gap:16px;margin-bottom:14px;font-size:11px;color:#6b6b67;flex-wrap:wrap}
+.legend span{display:flex;align-items:center;gap:4px}
+.legend i{display:inline-block;width:14px;height:10px;border-radius:3px}
+.acleg{display:flex;gap:12px;margin-bottom:14px;font-size:11px;color:#6b6b67;flex-wrap:wrap}
+.acleg span{display:flex;align-items:center;gap:4px}
+.acleg b{display:inline-block;width:3px;height:14px;border-radius:2px}
+.cw{background:#fff;border-radius:12px;border:1px solid #e8e6e1;overflow:hidden;margin-bottom:20px}
+.cs{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:950px}
+thead th{position:sticky;top:0;background:#fafaf8;font-size:10px;font-weight:500;color:#8a8a85;text-transform:uppercase;letter-spacing:.5px;padding:10px 6px;border-bottom:1px solid #e8e6e1;text-align:left}
+tbody tr{transition:background .1s}tbody tr:hover{background:#fafaf8}
+tr.eoi-row{background:#F8F5FD}tr.eoi-row:hover{background:#F0EBFA}
+.cn{font-size:12px;color:#2c2c2a;padding:6px 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;border-bottom:1px solid #f0efeb;vertical-align:middle}
+.eoi-tag{display:inline-block;font-size:9px;font-weight:600;background:#E8E1F5;color:#6C3FA0;padding:1px 6px;border-radius:3px;margin-left:5px;vertical-align:1px;letter-spacing:.3px}
+.ca{font-size:10px;color:#8a8a85;padding:6px 4px;border-bottom:1px solid #f0efeb;vertical-align:middle;white-space:nowrap}
+.cs2{font-size:10px;padding:6px 4px;border-bottom:1px solid #f0efeb;vertical-align:middle}
+.cs2 span{padding:2px 7px;border-radius:4px;font-weight:500}
+.sl{background:#e1f5ee;color:#085041}.su{background:#faeeda;color:#633806}.sc{background:#f1efe8;color:#444}.se{background:#E8E1F5;color:#6C3FA0}
+.ct{position:relative;height:26px;border-bottom:1px solid #f0efeb;vertical-align:middle;padding:0}
+.gl{position:absolute;top:0;bottom:0;width:1px;background:#f0efeb;pointer-events:none}
+.td{position:absolute;top:0;bottom:0;width:2px;background:#e24b4a;z-index:5;pointer-events:none}
+.tt{position:absolute;top:-1px;transform:translateX(-50%);font-size:8px;color:#e24b4a;font-weight:600;white-space:nowrap}
+.bar{position:absolute;top:5px;height:16px;border-radius:4px;min-width:5px;cursor:default;transition:opacity .12s}
+.bar:hover{opacity:.78}
+.bar .tip{display:none;position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:#2c2c2a;color:#fff;border-radius:8px;padding:7px 11px;font-size:11px;white-space:nowrap;z-index:20;pointer-events:none;line-height:1.5}
+.bar:hover .tip{display:block}
+.eoi-bar{position:absolute;top:5px;height:16px;border-radius:4px;cursor:default;background:repeating-linear-gradient(120deg,#D4C5F0,#D4C5F0 6px,#E8E1F5 6px,#E8E1F5 12px);border:1.5px solid #9B7FCF}
+.eoi-bar:hover{opacity:.85}
+.eoi-bar .tip{display:none;position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:#2c2c2a;color:#fff;border-radius:8px;padding:7px 11px;font-size:11px;white-space:nowrap;z-index:20;pointer-events:none;line-height:1.5}
+.eoi-bar:hover .tip{display:block}
+.eoi-bar-label{position:absolute;top:6px;font-size:8px;font-weight:700;color:#6C3FA0;letter-spacing:.5px;pointer-events:none;z-index:3}
+.pn{text-align:center;font-size:11px;color:#b4b2a9;margin-top:20px}
+@media print{body{background:#fff}.cw{border:1px solid #ddd;break-inside:avoid}.filter-bar,.pn{display:none}}
+@media(max-width:768px){.stats{grid-template-columns:repeat(2,1fr)}.cn{max-width:150px}.filter-bar{flex-direction:column;align-items:stretch}.filter-sep{display:none}}
+</style>
+</head>
+<body>
+<div class="page">
+<header>
+<div><h1>Canvas course timeline</h1>
+<div class="subtitle">Curtin University — all accounts</div></div>
+<div class="generated">Snapshot <span id="gd"></span></div>
+</header>
+<div class="stats" id="stats"></div>
+<div class="filter-bar" id="filters"></div>
+<div class="legend">
+<span><i style="background:#1d9e75"></i> Available (live)</span>
+<span><i style="background:#ef9f27"></i> Unpublished</span>
+<span><i style="background:repeating-linear-gradient(120deg,#D4C5F0,#D4C5F0 4px,#E8E1F5 4px,#E8E1F5 8px);border:1px solid #9B7FCF"></i> EOI</span>
+<span><i style="background:transparent;border:2px dashed #b4b2a9;width:12px;height:8px"></i> No end date</span>
+</div>
+<div class="acleg" id="acLeg"></div>
+<div class="cw"><div class="cs"><table id="g"></table></div></div>
+<div class="pn">Hover bars for details · Purple striped bars = EOI · Use date pickers or presets to zoom in</div>
+</div>
+<script>
+document.getElementById('gd').textContent=new Date().toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});
+const AC={'CLEPE':'#534AB7','Creds':'#1D9E75','CaaS':'#D85A30','FN Rangers':'#0F6E56','ATN':'#993556'};
+const COL={available:'#1d9e75',unpublished:'#ef9f27',completed:'#888780'};
+const BG={available:'#1d9e7525',unpublished:'#ef9f2725',completed:'#88878025'};
+
+const D=[
+{"n":"Motivation at Work 2024-2","s":"2025-01-01","e":"2025-10-28","st":"available","ac":"Creds"},
+{"n":"Designing Your Future: Modules 2 & 3","s":"2025-01-20","e":"2025-03-31","st":"unpublished","ac":"ATN"},
+{"n":"Creative Portfolio for Art Students","s":"2025-02-03","e":null,"st":"available","ac":"Creds"},
+{"n":"Creating & Presenting Media Stories [Creds]","s":"2025-02-03","e":"2025-12-10","st":"available","ac":"Creds"},
+{"n":"Creating & Presenting Media Stories — Support","s":"2025-02-03","e":null,"st":"available","ac":"Creds"},
+{"n":"SMART Work Design 2025-1","s":"2025-02-17","e":"2026-02-17","st":"available","ac":"Creds"},
+{"n":"Intro to Environment & Closure Planning (LoA-4)","s":"2025-02-17","e":"2026-02-17","st":"available","ac":"Creds"},
+{"n":"Intro to Ambient Air Quality & Monitoring","s":"2025-04-10","e":null,"st":"available","ac":"CLEPE"},
+{"n":"Introduction to Workplace Health & Safety","s":"2025-04-10","e":null,"st":"available","ac":"CLEPE"},
+{"n":"X-Ray Operator Course 2025-1","s":"2025-04-27","e":null,"st":"available","ac":"CaaS"},
+{"n":"Motivation at Work 2025-1","s":"2025-04-28","e":null,"st":"available","ac":"Creds"},
+{"n":"Your Story, Your Career in Australia","s":"2025-05-06","e":"2025-06-09","st":"available","ac":"CaaS"},
+{"n":"Real-Time Air Quality Monitoring","s":"2025-05-09","e":null,"st":"available","ac":"CLEPE"},
+{"n":"Intro to Native Seeds, Supply & Strategy","s":"2025-05-11","e":null,"st":"available","ac":"FN Rangers"},
+{"n":"Intro to Environment & Closure Planning (LoA-5)","s":"2025-05-19","e":"2026-05-19","st":"available","ac":"Creds"},
+{"n":"Surface Condition Monitoring","s":"2025-06-04","e":null,"st":"available","ac":"CLEPE"},
+{"n":"First Nation Ranger Program","s":"2025-06-27","e":null,"st":"available","ac":"FN Rangers"},
+{"n":"Art and Creativity [Creds]","s":"2025-07-21","e":null,"st":"available","ac":"Creds"},
+{"n":"SMART Work Design 2025-2","s":"2025-09-01","e":"2026-09-01","st":"available","ac":"Creds"},
+{"n":"Intro to Environment & Closure Planning (LoA-6)","s":"2025-09-22","e":"2026-09-22","st":"available","ac":"Creds"},
+{"n":"Intro to Student Equity Evaluation","s":"2025-09-24","e":null,"st":"available","ac":"CaaS"},
+{"n":"Program Logic Models for Equity Evaluation","s":"2025-09-24","e":null,"st":"available","ac":"CaaS"},
+{"n":"John Curtin's Vision: Legacy & Leadership","s":"2025-10-01","e":"2026-10-01","st":"unpublished","ac":"Creds"},
+{"n":"X-Ray Operator Course 2025-2","s":"2025-10-19","e":"2025-11-23","st":"available","ac":"CaaS"},
+{"n":"Relationships & Sexuality Education","s":"2025-10-27","e":null,"st":"available","ac":"Creds"},
+{"n":"John Curtin's Vision: Assessment","s":"2025-11-01","e":"2026-10-02","st":"available","ac":"Creds"},
+{"n":"Indigenous Success: Senior Leadership","s":"2025-11-19","e":null,"st":"available","ac":"CaaS"},
+{"n":"Naval Nuclear Foundations (Dry Run)","s":"2026-01-28","e":"2026-02-20","st":"unpublished","ac":"CLEPE"},
+{"n":"Sustainability Communication & Action","s":"2026-02-02","e":null,"st":"available","ac":"CLEPE"},
+{"n":"Creating & Presenting Media Stories","s":"2026-02-02","e":null,"st":"available","ac":"CLEPE"},
+{"n":"Art & Creativity","s":"2026-02-02","e":null,"st":"available","ac":"CLEPE"},
+{"n":"Geochemical Field Monitoring","s":"2026-02-09","e":null,"st":"available","ac":"CLEPE"},
+{"n":"SMART Work Design 2026 — Run 1","s":"2026-02-09","e":null,"st":"available","ac":"CLEPE"},
+{"n":"CQI in Student Equity","s":"2026-02-12","e":null,"st":"available","ac":"CaaS"},
+{"n":"Naval Nuclear Foundations — Run 1","s":"2026-03-12","e":"2027-04-13","st":"available","ac":"CLEPE"},
+{"n":"Design Thinking for Educators (SDG) [CLEPE]","s":"2026-03-26","e":null,"st":"available","ac":"CLEPE"},
+{"n":"Australian Defence Capability: Policy to Practice","s":"2026-04-07","e":"2026-06-06","st":"available","ac":"CLEPE"},
+{"n":"Design Thinking for Educators (SDG) [Creds]","s":"2026-04-13","e":null,"st":"available","ac":"Creds"},
+{"n":"Creative Practice Portfolio for Educators","s":"2026-04-20","e":null,"st":"unpublished","ac":"CLEPE"},
+{"n":"Environmental DNA Sampling","s":"2026-04-20","e":null,"st":"available","ac":"CLEPE"},
+{"n":"Motivation at Work 2026-1","s":"2026-04-20","e":null,"st":"available","ac":"CLEPE"},
+{"n":"Naval Nuclear Foundations — Run 2","s":"2026-05-21","e":null,"st":"available","ac":"CLEPE"},
+{"n":"Naval Nuclear Foundations (Run 2 copy)","s":"2026-05-21","e":null,"st":"unpublished","ac":"CLEPE"},
+{"n":"SMART Work Design 2026 — Run 2","s":"2026-06-01","e":"2027-06-01","st":"available","ac":"CLEPE"},
+{"n":"Naval Nuclear Foundations — Run 3","s":"2026-07-30","e":"2027-07-30","st":"unpublished","ac":"CLEPE"},
+{"n":"SMART Work Design 2026 — Run 3","s":"2026-09-07","e":null,"st":"available","ac":"CLEPE"}
+];
+
+const EOIS=[
+{"n":"Naval Nuclear Foundations *EOI*","st":"unpublished","ac":"CLEPE","family":"naval nuclear foundations"},
+{"n":"Australian Defence Capability *EOI*","st":"unpublished","ac":"CLEPE","family":"australian defence capability"},
+{"n":"SMART Work Design EOI","st":"unpublished","ac":"CLEPE","family":"smart work design"},
+{"n":"Motivation at Work EOI","st":"unpublished","ac":"CLEPE","family":"motivation at work"},
+];
+
+let fSt='all',fAc='all',fFrom='2025-01-01',fTo='2027-12-31';
+const accts=[...new Set(D.map(c=>c.ac))].sort();
+document.getElementById('acLeg').innerHTML=Object.entries(AC).map(([k,v])=>`<span><b style="background:${v}"></b>${k}</span>`).join('');
+
+function setPreset(f,t){fFrom=f;fTo=t;render()}
+function familyKey(n){return n.replace(/\bEOI\b|\*EOI\*|\d{4}[-–]\d|\d{4}|run \d|copy|\[.*?\]|—/gi,'').replace(/[^a-zA-Z ]/g,'').trim().toLowerCase().replace(/\s+/g,' ')}
+
+function render(){
+const T0=new Date(fFrom),T1=new Date(fTo),TMS=T1-T0;
+if(TMS<=0)return;
+const pct=d=>Math.max(0,Math.min(100,((new Date(d)-T0)/TMS)*100));
+
+let data=[...D].filter(c=>{const sd=new Date(c.s),ed=c.e?new Date(c.e):sd;return ed>=T0&&sd<=T1});
+let eois=[...EOIS];
+if(fSt!=='all'&&fSt!=='eoi'){data=data.filter(c=>c.st===fSt);eois=eois.filter(c=>c.st===fSt)}
+if(fSt==='eoi'){data=[];} // show only EOIs
+if(fAc!=='all'){data=data.filter(c=>c.ac===fAc);eois=eois.filter(c=>c.ac===fAc)}
+
+const live=D.filter(c=>c.st==='available').length,unpub=D.filter(c=>c.st==='unpublished').length;
+document.getElementById('stats').innerHTML=
+`<div class="stat-card"><div class="stat-label">Courses</div><div class="stat-value">${data.length}</div></div>`+
+`<div class="stat-card"><div class="stat-label">Live</div><div class="stat-value grn">${live}</div></div>`+
+`<div class="stat-card"><div class="stat-label">Unpublished</div><div class="stat-value amb">${unpub}</div></div>`+
+`<div class="stat-card"><div class="stat-label">EOIs</div><div class="stat-value pur">${eois.length}</div></div>`+
+`<div class="stat-card"><div class="stat-label">Accounts</div><div class="stat-value">${accts.length}</div></div>`;
+
+const presets=[{l:'H1 2025',f:'2025-01-01',t:'2025-06-30'},{l:'H2 2025',f:'2025-07-01',t:'2025-12-31'},{l:'2025',f:'2025-01-01',t:'2025-12-31'},{l:'H1 2026',f:'2026-01-01',t:'2026-06-30'},{l:'H2 2026',f:'2026-07-01',t:'2026-12-31'},{l:'2026',f:'2026-01-01',t:'2026-12-31'},{l:'2025–2027',f:'2025-01-01',t:'2027-12-31'}];
+document.getElementById('filters').innerHTML=
+`<div class="filter-group"><label>From</label><input type="date" value="${fFrom}" onchange="fFrom=this.value;render()"></div>`+
+`<div class="filter-group"><label>To</label><input type="date" value="${fTo}" onchange="fTo=this.value;render()"></div>`+
+`<div class="filter-sep"></div>`+
+`<div class="preset-btns">${presets.map(p=>`<button class="${fFrom===p.f&&fTo===p.t?'active':''}" onclick="setPreset('${p.f}','${p.t}')">${p.l}</button>`).join(' ')}</div>`+
+`<div class="filter-sep"></div>`+
+`<div class="filter-group"><label>Account</label><select onchange="fAc=this.value;render()"><option value="all">All</option>${accts.map(a=>`<option value="${a}"${fAc===a?' selected':''}>${a}</option>`).join('')}</select></div>`+
+`<div class="filter-sep"></div>`+
+`<div class="filter-group"><label>Status</label>${['all','available','unpublished','eoi'].map(s=>`<button class="${fSt===s?'on':''}" onclick="fSt='${s}';render()">${s==='all'?'All':s==='eoi'?'EOIs only':s[0].toUpperCase()+s.slice(1)}</button>`).join('')}</div>`;
+
+const months=[];let cur=new Date(T0.getFullYear(),T0.getMonth(),1);
+while(cur<T1){months.push(new Date(cur));cur=new Date(cur.getFullYear(),cur.getMonth()+1,1)}
+const step=months.length>24?6:months.length>12?3:months.length>6?2:1;
+const hdrMonths=months.filter((_,i)=>i%step===0);
+
+let h='<thead><tr><th style="width:220px">Course</th><th style="width:75px">Account</th><th style="width:70px">Type</th><th style="position:relative;padding:0"><div style="display:flex;justify-content:space-between;padding:10px 4px">';
+hdrMonths.forEach(m=>{h+=`<span style="font-size:9px">${m.toLocaleString('en-AU',{month:'short',year:'2-digit'})}</span>`});
+h+='</div></th></tr></thead><tbody>';
+
+// Build family groups: EOI + its runs
+const eoiFamilies={};
+eois.forEach(e=>{eoiFamilies[e.family]=eoiFamilies[e.family]||{eoi:null,runs:[]};eoiFamilies[e.family].eoi=e});
+data.forEach(c=>{
+  const fk=familyKey(c.n);
+  Object.keys(eoiFamilies).forEach(fam=>{
+    if(fk.includes(fam)||fam.includes(fk.substring(0,15))){
+      eoiFamilies[fam].runs.push(c);
+    }
+  });
+});
+
+// Render: interleave EOI rows before their first matching run
+const renderedEOIs=new Set();
+const renderedCourses=new Set();
+
+// First pass: grouped courses (EOI then runs)
+Object.entries(eoiFamilies).forEach(([fam,group])=>{
+  if(!group.eoi)return;
+  if(fAc!=='all'&&group.eoi.ac!==fAc)return;
+
+  // EOI bar row
+  const e=group.eoi;
+  const acCol=AC[e.ac]||'#888';
+  // Find the earliest run to position the EOI bar before it
+  const firstRun=group.runs.length?group.runs.sort((a,b)=>new Date(a.s)-new Date(b.s))[0]:null;
+  const eoiLeft=firstRun?Math.max(0,pct(firstRun.s)-6):2;
+  const eoiWidth=firstRun?Math.min(4,98-eoiLeft):30;
+
+  h+=`<tr class="eoi-row"><td class="cn" title="${e.n}">${e.n} <span class="eoi-tag">EOI</span></td><td class="ca">${e.ac}</td><td class="cs2"><span class="se">EOI</span></td>`;
+  h+=`<td class="ct"><div style="position:relative;width:100%;height:100%">`;
+  months.forEach(m=>{h+=`<div class="gl" style="left:${pct(m.toISOString())}%"></div>`});
+  const tp=pct(new Date().toISOString());
+  if(tp>0&&tp<100)h+=`<div class="td" style="left:${tp}%"><span class="tt">Today</span></div>`;
+  h+=`<div class="eoi-bar" style="left:${eoiLeft}%;width:${eoiWidth}%"><div class="tip"><strong>${e.n}</strong><br>Type: Expression of Interest<br>Status: ${e.st} · Account: ${e.ac}<br>No dates set — open for registration</div></div>`;
+  h+=`<span class="eoi-bar-label" style="left:${eoiLeft+eoiWidth+.5}%">EOI</span>`;
+  h+=`</div></td></tr>`;
+  renderedEOIs.add(fam);
+
+  // Render matching runs immediately after
+  group.runs.forEach(c=>{
+    renderedCourses.add(c.n+c.s);
+    h+=renderCourseRow(c,pct,months);
+  });
+});
+
+// Second pass: remaining courses not matched to an EOI
+data.filter(c=>!renderedCourses.has(c.n+c.s)).forEach(c=>{
+  h+=renderCourseRow(c,pct,months);
+});
+
+if(data.length===0&&eois.length===0){
+  h+='<tr><td colspan="4" style="padding:30px;text-align:center;color:#8a8a85">No courses match these filters</td></tr>';
+}
+
+h+='</tbody>';
+document.getElementById('g').innerHTML=h;
+}
+
+function renderCourseRow(c,pct,months){
+const sp=pct(c.s);let ep,dash=false;
+if(c.e){ep=pct(c.e)}else{ep=Math.min(sp+3.5,98);dash=true}
+const w=Math.max(.7,ep-sp),col=COL[c.st]||'#888',bg=BG[c.st]||'#8882',acCol=AC[c.ac]||'#888';
+const sL=new Date(c.s).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+const eL=c.e?new Date(c.e).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}):'No end date';
+const stC=c.st==='available'?'sl':c.st==='unpublished'?'su':'sc';
+let h=`<tr><td class="cn" title="${c.n}">${c.n}</td><td class="ca">${c.ac}</td><td class="cs2"><span class="${stC}">${c.st}</span></td>`;
+h+=`<td class="ct"><div style="position:relative;width:100%;height:100%">`;
+months.forEach(m=>{h+=`<div class="gl" style="left:${pct(m.toISOString())}%"></div>`});
+const tp=pct(new Date().toISOString());
+if(tp>0&&tp<100)h+=`<div class="td" style="left:${tp}%"><span class="tt">Today</span></div>`;
+h+=`<div class="bar" style="left:${sp}%;width:${w}%;background:${bg};border-left:3px solid ${acCol};${dash?'border-right:2px dashed '+col:'border-right:3px solid '+col}"><div class="tip"><strong>${c.n}</strong><br>${sL} → ${eL}<br>Account: ${c.ac} · Status: ${c.st}</div></div></div></td></tr>`;
+return h;
+}
+
+render();
+</script>
+</body>
+</html>
