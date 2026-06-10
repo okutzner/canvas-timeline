@@ -41,18 +41,32 @@ async function fetchAllPages(url) {
 }
 
 async function fetchAccountNames() {
+  const map = {};
   try {
+    // Fetch top-level accounts
     const res = await fetch(`${CANVAS_URL}/api/v1/accounts`, {
       headers: { Authorization: `Bearer ${CANVAS_TOKEN}` },
     });
-    if (!res.ok) return {};
-    const accounts = await res.json();
-    const map = {};
-    accounts.forEach((a) => (map[a.id] = a.name));
-    return map;
-  } catch {
-    return {};
-  }
+    if (res.ok) {
+      const accounts = await res.json();
+      accounts.forEach((a) => (map[a.id] = a.name));
+    }
+    // Fetch sub-accounts for each account
+    for (const id of ACCOUNT_IDS) {
+      try {
+        const subRes = await fetch(
+          `${CANVAS_URL}/api/v1/accounts/${id}/sub_accounts?per_page=100`,
+          { headers: { Authorization: `Bearer ${CANVAS_TOKEN}` } }
+        );
+        if (subRes.ok) {
+          const subs = await subRes.json();
+          subs.forEach((a) => (map[a.id] = a.name));
+        }
+      } catch {}
+    }
+  } catch {}
+  return map;
+}
 }
 
 // ── Main ───────────────────────────────────────────────────────────────────
