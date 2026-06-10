@@ -1,9 +1,3 @@
-/**
- * build.js
- * Fetches course data from Canvas API and generates a static HTML dashboard.
- * Run manually or via GitHub Actions on a schedule.
- */
-
 const fetch = require("node-fetch");
 const fs = require("fs");
 const path = require("path");
@@ -19,8 +13,6 @@ if (!CANVAS_TOKEN) {
   process.exit(1);
 }
 
-// ── Fetch helpers ──────────────────────────────────────────────────────────
-
 async function fetchAllPages(url) {
   const results = [];
   let nextUrl = url;
@@ -29,7 +21,7 @@ async function fetchAllPages(url) {
       headers: { Authorization: `Bearer ${CANVAS_TOKEN}` },
     });
     if (!res.ok) {
-      console.error(`  ✗ ${res.status} for ${nextUrl}`);
+      console.error("  Error " + res.status + " for " + nextUrl);
       break;
     }
     results.push(...(await res.json()));
@@ -43,108 +35,92 @@ async function fetchAllPages(url) {
 async function fetchAccountNames() {
   const map = {};
   try {
-    // Fetch top-level accounts
-    const res = await fetch(`${CANVAS_URL}/api/v1/accounts`, {
-      headers: { Authorization: `Bearer ${CANVAS_TOKEN}` },
+    var res = await fetch(CANVAS_URL + "/api/v1/accounts", {
+      headers: { Authorization: "Bearer " + CANVAS_TOKEN },
     });
     if (res.ok) {
-      const accounts = await res.json();
-      accounts.forEach((a) => (map[a.id] = a.name));
+      var accounts = await res.json();
+      accounts.forEach(function (a) { map[a.id] = a.name; });
     }
-    // Fetch sub-accounts for each account
-    for (const id of ACCOUNT_IDS) {
+    for (var i = 0; i < ACCOUNT_IDS.length; i++) {
       try {
-        const subRes = await fetch(
-          `${CANVAS_URL}/api/v1/accounts/${id}/sub_accounts?per_page=100`,
-          { headers: { Authorization: `Bearer ${CANVAS_TOKEN}` } }
+        var subRes = await fetch(
+          CANVAS_URL + "/api/v1/accounts/" + ACCOUNT_IDS[i] + "/sub_accounts?per_page=100",
+          { headers: { Authorization: "Bearer " + CANVAS_TOKEN } }
         );
         if (subRes.ok) {
-          const subs = await subRes.json();
-          subs.forEach((a) => (map[a.id] = a.name));
+          var subs = await subRes.json();
+          subs.forEach(function (a) { map[a.id] = a.name; });
         }
-      } catch {}
+      } catch (e) {}
     }
-  } catch {}
+  } catch (e) {}
   return map;
 }
-}
-
-// ── Main ───────────────────────────────────────────────────────────────────
 
 async function main() {
-  console.log("Canvas Course Timeline — Build\n");
+  console.log("Canvas Course Timeline Build\n");
 
-  const accountNames = await fetchAccountNames();
-  const allCourses = [];
+  var accountNames = await fetchAccountNames();
+  var allCourses = [];
 
-  for (const id of ACCOUNT_IDS) {
-    const url = `${CANVAS_URL}/api/v1/accounts/${id}/courses?per_page=100`;
-    console.log(`Fetching account ${id} (${accountNames[id] || "?"})...`);
-    const courses = await fetchAllPages(url);
-    console.log(`  ✓ ${courses.length} courses`);
-    allCourses.push(...courses);
+  for (var i = 0; i < ACCOUNT_IDS.length; i++) {
+    var id = ACCOUNT_IDS[i];
+    var url = CANVAS_URL + "/api/v1/accounts/" + id + "/courses?per_page=100";
+    console.log("Fetching account " + id + " (" + (accountNames[id] || "?") + ")...");
+    var courses = await fetchAllPages(url);
+    console.log("  Found " + courses.length + " courses");
+    allCourses.push.apply(allCourses, courses);
   }
 
-  // Deduplicate
-  const seen = new Set();
-  const unique = allCourses.filter((c) => {
-    if (seen.has(c.id)) return false;
-    seen.add(c.id);
+  var seen = {};
+  var unique = allCourses.filter(function (c) {
+    if (seen[c.id]) return false;
+    seen[c.id] = true;
     return true;
   });
 
-  // Transform
-  const processed = unique.map((c) => ({
-    id: c.id,
-    n: c.name,
-    s: c.start_at ? c.start_at.split("T")[0] : null,
-    e: c.end_at ? c.end_at.split("T")[0] : null,
-    st: c.workflow_state,
-    ac: accountNames[c.account_id] || `Account ${c.account_id}`,
-    sis: c.sis_course_id || null,
-  }));
+  var processed = unique.map(function (c) {
+    return {
+      id: c.id,
+      n: c.name,
+      s: c.start_at ? c.start_at.split("T")[0] : null,
+      e: c.end_at ? c.end_at.split("T")[0] : null,
+      st: c.workflow_state,
+      ac: accountNames[c.account_id] || ("Account " + c.account_id),
+      sis: c.sis_course_id || null,
+    };
+  });
 
-  console.log(`\nTotal unique courses: ${processed.length}`);
+  console.log("\nTotal unique courses: " + processed.length);
 
-  // Separate EOIs, skip sandbox/template, keep dated courses
-  const eoiRe = /\bEOI\b|\*EOI\*|expression of interest/i;
-  const skipRe =
-    /sandbox|template|blueprint|back-?up|mock-?up|\bdev\b|sample|\bcopy\b$|\bold\b |archived|test\b/i;
+  var eoiRe = /\bEOI\b|\*EOI\*|expression of interest/i;
+  var skipRe = /sandbox|template|blueprint|back-?up|mock-?up|\bdev\b|sample|\bcopy\b$|\bold\b |archived|\btest\b/i;
 
-  const eois = processed.filter((c) => eoiRe.test(c.n) && !skipRe.test(c.n));
-  const dated = processed.filter(
-    (c) => c.s && !eoiRe.test(c.n) && !skipRe.test(c.n)
-  );
+  var eois = processed.filter(function (c) { return eoiRe.test(c.n) && !skipRe.test(c.n); });
+  var dated = processed.filter(function (c) { return c.s && !eoiRe.test(c.n) && !skipRe.test(c.n); });
 
-  dated.sort((a, b) => a.s.localeCompare(b.s));
+  dated.sort(function (a, b) { return a.s.localeCompare(b.s); });
 
-  console.log(`Dated courses (non-EOI, non-skip): ${dated.length}`);
-  console.log(`EOIs: ${eois.length}`);
+  console.log("Dated courses: " + dated.length);
+  console.log("EOIs: " + eois.length);
 
-  // Build family keys for EOIs
   function familyKey(name) {
     return name
-      .replace(
-        /\bEOI\b|\*EOI\*|\d{4}[-–]\d|\d{4}|run \d|\bcopy\b|\[.*?\]|—/gi,
-        ""
-      )
+      .replace(/\bEOI\b|\*EOI\*|\d{4}[-–]\d|\d{4}|run \d|\bcopy\b|\[.*?\]|—/gi, "")
       .replace(/[^a-zA-Z ]/g, "")
       .trim()
       .toLowerCase()
       .replace(/\s+/g, " ");
   }
 
-  const eoiData = eois.map((e) => ({
-    ...e,
-    family: familyKey(e.n),
-  }));
+  var eoiData = eois.map(function (e) {
+    return { n: e.n, s: e.s, e: e.e, st: e.st, ac: e.ac, sis: e.sis, family: familyKey(e.n) };
+  });
 
-  // Read the HTML template and inject data
-  const template = fs.readFileSync(
-    path.join(__dirname, "template.html"),
-    "utf8"
-  );
-  const timestamp = new Date().toLocaleDateString("en-AU", {
+  var template = fs.readFileSync(path.join(__dirname, "template.html"), "utf8");
+
+  var timestamp = new Date().toLocaleString("en-AU", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -153,21 +129,20 @@ async function main() {
     timeZone: "Australia/Perth",
   });
 
-  const html = template
+  var html = template
     .replace("__COURSES_DATA__", JSON.stringify(dated))
     .replace("__EOIS_DATA__", JSON.stringify(eoiData))
     .replace("__BUILD_TIME__", timestamp)
     .replace("__COURSE_COUNT__", String(processed.length));
 
-  // Write output
-  const outDir = path.join(__dirname, "dist");
+  var outDir = path.join(__dirname, "dist");
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
   fs.writeFileSync(path.join(outDir, "index.html"), html);
 
-  console.log(`\n✓ Built dist/index.html (${(html.length / 1024).toFixed(0)} KB)`);
+  console.log("\nBuilt dist/index.html (" + Math.round(html.length / 1024) + " KB)");
 }
 
-main().catch((err) => {
+main().catch(function (err) {
   console.error(err);
   process.exit(1);
 });
