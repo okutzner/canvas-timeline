@@ -145,7 +145,7 @@ if(!g.eoi)return;if(fAc!=='all'&&g.eoi.ac!==fAc)return;
 const e=g.eoi,acCol=acColors[e.ac]||'#888';
 const firstRun=g.runs.length?g.runs.sort((a,b)=>a.s.localeCompare(b.s))[0]:null;
 const eoiL=firstRun?Math.max(0,pct(firstRun.s)-6):2,eoiW=firstRun?Math.min(4,98-eoiL):30;
-h+=`<tr class="eoi-row"><td class="cn" title="${e.n}">${e.n} <span class="eoi-tag">EOI</span></td><td class="ca">${e.ac}</td><td class="cs2"><span class="se">EOI</span></td>`;
+h+=`<tr class="eoi-row"><td class="cn" title="${e.n}">${e.n} <span style="font-size:9px;color:#b4b2a9;font-weight:400">#${e.id}</span> <span class="eoi-tag">EOI</span></td><td class="ca">${e.ac}</td><td class="cs2"><span class="se">EOI</span></td>`;
 h+=`<td class="ct"><div style="position:relative;width:100%;height:100%">`;
 months.forEach(m=>{h+=`<div class="gl" style="left:${pct(m.toISOString())}%"></div>`});
 const tp=pct(new Date().toISOString());if(tp>0&&tp<100)h+=`<div class="td" style="left:${tp}%"><span class="tt">Today</span></div>`;
@@ -164,7 +164,7 @@ const w=Math.max(.7,ep-sp),col=COL[c.st]||'#888',bg=BG[c.st]||'#8882',acCol=acCo
 const sL=new Date(c.s).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
 const eL=c.e?new Date(c.e).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}):'No end date';
 const stC=c.st==='available'?'sl':c.st==='unpublished'?'su':'sc';
-let h=`<tr><td class="cn" title="${c.n}">${c.n}</td><td class="ca">${c.ac}</td><td class="cs2"><span class="${stC}">${c.st}</span></td>`;
+let h=`<tr><td class="cn" title="${c.n}">${c.n} <span style="font-size:9px;color:#b4b2a9;font-weight:400">#${c.id}</span></td><td class="ca">${c.ac}</td><td class="cs2"><span class="${stC}">${c.st}</span></td>`;
 h+=`<td class="ct"><div style="position:relative;width:100%;height:100%">`;
 months.forEach(m=>{h+=`<div class="gl" style="left:${pct(m.toISOString())}%"></div>`});
 const tp=pct(new Date().toISOString());if(tp>0&&tp<100)h+=`<div class="td" style="left:${tp}%"><span class="tt">Today</span></div>`;
