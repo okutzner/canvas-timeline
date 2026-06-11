@@ -133,7 +133,7 @@ async function main() {
     .replace("__COURSES_DATA__", JSON.stringify(dated))
     .replace("__EOIS_DATA__", JSON.stringify(eoiData))
     .replace("__BUILD_TIME__", timestamp)
-    .replace("__COURSE_COUNT__", String(processed.length));
+    .replace("__COURSE_COUNT__", String(processed.length))     .replace("__CANVAS_URL__", CANVAS_URL);
 
   var outDir = path.join(__dirname, "dist");
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
