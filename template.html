@@ -89,6 +89,7 @@ tr.eoi-row{background:#F8F5FD}tr.eoi-row:hover{background:#F0EBFA}
 <div class="pn">Hover bars for details · Purple striped bars = EOI · Click course names to expand</div>
 </div>
 <script>
+const CURL='__CANVAS_URL__';
 const D=__COURSES_DATA__;
 const EOIS=__EOIS_DATA__;
 const palette=['#534AB7','#1D9E75','#D85A30','#0F6E56','#993556','#2980B9','#8B5E3C','#6C3483','#1A5276','#C0392B'];
@@ -149,7 +150,7 @@ h+=`<tr class="eoi-row"><td class="cn" title="${e.n}">${e.n} <span style="font-s
 h+=`<td class="ct"><div style="position:relative;width:100%;height:100%">`;
 months.forEach(m=>{h+=`<div class="gl" style="left:${pct(m.toISOString())}%"></div>`});
 const tp=pct(new Date().toISOString());if(tp>0&&tp<100)h+=`<div class="td" style="left:${tp}%"><span class="tt">Today</span></div>`;
-h+=`<div class="eoi-bar" style="left:${eoiL}%;width:${eoiW}%"><div class="tip"><strong>${e.n}</strong><br>Type: Expression of Interest<br>${e.s ? new Date(e.s).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) + ' → ' + (e.e ? new Date(e.e).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : 'No end date') : 'No dates set — open for registration'}<br>Status: ${e.st} · Account: ${e.ac}${e.sis ? ' · SIS: '+e.sis : ''}</div></div>`;
+h+=`<div class="eoi-bar" onclick="window.open(CURL+'/courses/'+e.id,'_blank')" style="left:${eoiL}%;width:${eoiW}%"><div class="tip"><strong>${e.n}</strong><br>Type: Expression of Interest<br>${e.s ? new Date(e.s).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) + ' → ' + (e.e ? new Date(e.e).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}) : 'No end date') : 'No dates set — open for registration'}<br>Status: ${e.st} · Account: ${e.ac}${e.sis ? ' · SIS: '+e.sis : ''}</div></div>`;
 h+=`<span class="eoi-bar-label" style="left:${eoiL+eoiW+.5}%">EOI</span></div></td></tr>`;
 renderedEOIs.add(fam);
 g.runs.forEach(c=>{renderedCourses.add(c.n+c.s);h+=rr(c,pct,months)});
@@ -164,11 +165,11 @@ const w=Math.max(.7,ep-sp),col=COL[c.st]||'#888',bg=BG[c.st]||'#8882',acCol=acCo
 const sL=new Date(c.s).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'});
 const eL=c.e?new Date(c.e).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}):'No end date';
 const stC=c.st==='available'?'sl':c.st==='unpublished'?'su':'sc';
-let h=`<tr><td class="cn" title="${c.n}">${c.n} <span style="font-size:9px;color:#b4b2a9;font-weight:400">#${c.id}</span></td><td class="ca">${c.ac}</td><td class="cs2"><span class="${stC}">${c.st}</span></td>`;
+let h=`<tr><td class="cn" title="${c.n}" onclick="window.open(CURL+'/courses/'+c.id,'_blank')">${c.n} <span style="font-size:9px;color:#b4b2a9;font-weight:400">#${c.id}</span></td><td class="ca">${c.ac}</td><td class="cs2"><span class="${stC}">${c.st}</span></td>`;
 h+=`<td class="ct"><div style="position:relative;width:100%;height:100%">`;
 months.forEach(m=>{h+=`<div class="gl" style="left:${pct(m.toISOString())}%"></div>`});
 const tp=pct(new Date().toISOString());if(tp>0&&tp<100)h+=`<div class="td" style="left:${tp}%"><span class="tt">Today</span></div>`;
-h+=`<div class="bar" style="left:${sp}%;width:${w}%;background:${bg};border-left:3px solid ${acCol};${dash?'border-right:2px dashed '+col:'border-right:3px solid '+col}"><div class="tip"><strong>${c.n}</strong><br>${sL} → ${eL}<br>Account: ${c.ac} · Status: ${c.st}${c.sis?' · SIS: '+c.sis:''}</div></div></div></td></tr>`;
+h+=`<div class="bar" onclick="window.open(CURL+'/courses/'+c.id,'_blank')" style="left:${sp}%;width:${w}%;background:${bg};border-left:3px solid ${acCol};${dash?'border-right:2px dashed '+col:'border-right:3px solid '+col}"><div class="tip"><strong>${c.n}</strong><br>${sL} → ${eL}<br>Account: ${c.ac} · Status: ${c.st}${c.sis?' · SIS: '+c.sis:''}</div></div></div></td></tr>`;
 return h;}
 document.getElementById('g').addEventListener('click',function(e){const cell=e.target.closest('.cn');if(cell)cell.classList.toggle('expanded')});
 let allExpanded=false;
